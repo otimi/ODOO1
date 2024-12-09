@@ -3,14 +3,18 @@
 
 from .hooks import pre_init_hook
 
-from . import models
+# Remover a importação do models aqui
+# from . import models
 
 from odoo.addons import account
 from odoo import api, tools, SUPERUSER_ID
 
-# Install Simple Chart of Account Template for Brazilian Companies
-_auto_install_l10n_original = account._auto_install_l10n
+# Função para carregar o modelo quando necessário
+def load_models():
+    from . import models
 
+# Instalar o Template do Simple Chart of Account para Empresas Brasileiras
+_auto_install_l10n_original = account._auto_install_l10n
 
 def _auto_install_l10n_br_generic_module(env):
     country_code = env.company.country_id.code
@@ -23,7 +27,7 @@ def _auto_install_l10n_br_generic_module(env):
         else:
             module_name_domain = [("name", "=", "l10n_br_coa_simple")]
 
-        # Load all l10n_br COA's in demo mode:
+        # Carregar todos os COA l10n_br em modo demo:
         env.cr.execute("select demo from ir_module_module where name='l10n_br_base';")
         if env.cr.fetchone()[0]:
             module_name_domain = [
@@ -40,6 +44,5 @@ def _auto_install_l10n_br_generic_module(env):
         module_ids.sudo().button_install()
     else:
         _auto_install_l10n_original(env)
-
 
 account._auto_install_l10n = _auto_install_l10n_br_generic_module
